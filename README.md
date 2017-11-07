@@ -1,6 +1,8 @@
 # Snakemake workflow: accel-amplicon-trimming
 
-[![Build Status](https://travis-ci.org/clinical-genomics-uppsala/accel_amplicon_trimming/builds/298537564#)
+[![Snakemake](https://img.shields.io/badge/snakemake-≥4.3.0-brightgreen.svg)](https://snakemake.bitbucket.io)
+[![Build Status](https://travis-ci.org/clinical-genomics-uppsala/accel_amplicon_trimming.svg?branch=master)](https://travis-ci.org/clinical-genomics-uppsala/accel_amplicon_trimming)
+
 
 This workflow performs read trimming on Accel Amplicon Panel data, using the
 recommended guidelines provided by [Swift](https://swiftbiosci.com/wp-content/uploads/2017/03/17-1397-Amplicon-Bioinf-Guidelines.pdf)
