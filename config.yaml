@@ -1,0 +1,8 @@
+---
+
+illuminaclip_file: illuminaclip.fa
+
+accel_sequences:
+  panel1:
+    5p_primer_file: 5p_primers.fa
+    3p_primer_file': 3p_primers.fa
