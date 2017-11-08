@@ -1,2 +1,2 @@
-sample	panel	input_folder	sample_number	lane
-A	panel1	fastq	S1	L001
+sample	panel	fq1	fq2
+A	panel1	A.1.fastq.gz	A.2.fastq.gz

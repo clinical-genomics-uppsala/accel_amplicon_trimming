@@ -31,15 +31,15 @@ working directory.
 
 Example of a sample.tsv, columns need to be tab separated
 ...............................................................................
-sample   panel   input_folder   sample_number  lane
-sample1  panel1  fastq/sample1  S1             L001
-sample2  panel2  fastq          S2             L001
+sample     panel     fq1                fq2
+sample1    panel1    sample1.R1.fastq   sample1.R2.fastq
+sample2    panel2    sample2.R1.fastq   sample2.R2.fastq
 ...............................................................................
 
 Output files will be:
-1 - seqdata_trimmed/{sample}_{s_counter}_{lane}_R1_001.trimmomatic_cutadapt.fastq.gz
-2 - seqdata_trimmed/{sample}_{s_counter}_{lane}_R2_001.trimmomatic_cutadapt.fastq.gz
-3 - seqdata_trimmed/{sample}_{s_counter}_{lane}_001.trimmomatic_cutadapt.qc.txt
+1 - seqdata_trimmed/{sample}.R1.trimmomatic_cutadapt.fastq.gz
+2 - seqdata_trimmed/{sample}.R2.trimmomatic_cutadapt.fastq.gz
+3 - seqdata_trimmed/{sample}.trimmomatic_cutadapt.qc.txt
 """
 
 __author__ = "Patrik Semds"
@@ -50,11 +50,10 @@ import pandas as pd
 configfile: "config.yaml"
 samples = pd.read_table("samples.tsv", index_col=0)
 
-file_endings = ["_R1_001.trimmomatic_cutadapt.fastq.gz", "_R2_001.trimmomatic_cutadapt.fastq.gz", "_001.trimmomatic_cutadapt.qc.txt"]
+file_endings = [".R1.trimmomatic_cutadapt.fastq.gz", ".R2.trimmomatic_cutadapt.fastq.gz", ".trimmomatic_cutadapt.qc.txt"]
 
 def generate_file_output():
-    return [os.path.join("seqdata_trimmed/",
-                str(row.Index) + "_" + str(row.sample_number) + "_" + str(row.lane) + ending)
+    return [os.path.join("seqdata_trimmed", str(row.Index) + ending)
         for row in samples.itertuples()
             for ending in file_endings]
 
