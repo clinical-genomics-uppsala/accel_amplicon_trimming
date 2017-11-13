@@ -1,51 +1,6 @@
 # vim: syntax=python tabstop=4 expandtab
 # coding: utf-8
 
-"""
-Read trimming for Accel-Amplicon Panel
-(https://swiftbiosci.com/wp-content/uploads/2017/03/17-1397-Amplicon-Bioinf-Guidelines.pdf)
-
-Requirements
-Samples have to be Paired-End Illumina sequences.
-
-Expects the global variable config of at least the following structure
-...............................................................................
----
-
-illuminaclip_file: /path/to/illumina.fa
-
-accel_panels:
-  panel1:
-    5p_primer_file: /path/to/5p_primers.fa
-    3p_primer_file: /path/to/3p_primers.fa
-  panel2:
-    5p_primer_file: /path/to/5p_primers.fa
-    3p_primer_file: /path/to/3p_primers.fa
-
-...............................................................................
-
-Expects a samples config
-With the following dictionary structure (panel, sample_number and lane are
-required)
-
-samples = {
-    'panel': {sample_id: value},
-    'fq1': {samplei_id: value},
-    'fq2' {sample_id: value}
-}
-the panel key should contain a value that can be found under
-accel_panels in the config.yaml file. If input_folder isn't specified it will
-be assumed that the fastq files are located under the working directory.
-
-Example of a sample.tsv that can be imported using pandas (columns need to be
-tab separated)
-...............................................................................
-sample     panel     fq1                fq2
-sample1    panel1    sample1.R1.fastq   sample1.R2.fastq
-sample2    panel2    sample2.R1.fastq   sample2.R2.fastq
-...............................................................................
-"""
-
 __author__ = "Patrik Smeds"
 __license__ = "MIT"
 
