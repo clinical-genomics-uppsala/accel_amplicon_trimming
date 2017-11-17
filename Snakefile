@@ -11,7 +11,7 @@ units.index = units.index.set_levels([i.astype(str) for i in units.index.levels]
 file_endings = [".R1.trimmomatic_cutadapt.fastq.gz", ".R2.trimmomatic_cutadapt.fastq.gz", ".trimmomatic_cutadapt.qc.txt"]
 
 def generate_file_output():
-    return [os.path.join("seqdata_trimmed", str(row.Index[0]) + "-" + str(row.Index[1]) + ending)
+    return [os.path.join("trimmed", str(row.Index[0]) + "-" + str(row.Index[1]) + ending)
         for row in units.itertuples()
             for ending in file_endings]
 
