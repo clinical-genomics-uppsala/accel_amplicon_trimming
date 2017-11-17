@@ -50,8 +50,8 @@ rule trimmomatic:
 
 rule cutadapt_step1:
     input:
-        ["{sample}-{unit}.R1.trimmomatic.fastq",
-         "{sample}-{unit}.R2.trimmomatic.fastq"]
+        "{sample}-{unit}.R1.trimmomatic.fastq",
+         "{sample}-{unit}.R2.trimmomatic.fastq"
     params:
         " --minimum-length 40",
         " -e 0.12",
@@ -66,8 +66,8 @@ rule cutadapt_step1:
 
 rule cutadapt_step2:
     input:
-        ["{sample}-{unit}.tmpR2.fastq",
-         "{sample}-{unit}.tmpR1.fastq"]
+        "{sample}-{unit}.tmpR2.fastq",
+         "{sample}-{unit}.tmpR1.fastq"
     output:
         fastq1=temp("{sample}-{unit}.5ptmpR2.fastq"),
         fastq2=temp("{sample}-{unit}.5ptmpR1.fastq"),
@@ -103,8 +103,8 @@ rule cutadapt_step3:
 
 rule cutadapt_step4:
     input:
-        ["{sample}-{unit}.tmp3R2.fastq",
-         "{sample}-{unit}.tmp3R1.fastq"]
+        "{sample}-{unit}.tmp3R2.fastq",
+         "{sample}-{unit}.tmp3R1.fastq"
     output:
         fastq1="{sample}-{unit}.R1.trimmomatic_cutadapt.fastq.gz",
         fastq2="{sample}-{unit}.R2.trimmomatic_cutadapt.fastq.gz",
