@@ -129,4 +129,4 @@ rule merge_logs:
         with open(output.qc,"w") as out:
             for qc_file in input.qc:
                 with open(qc_file,"r") as qc_input:
-                    out.write(str(qc_input.read()))
+                    out.write(qc_input.read())
