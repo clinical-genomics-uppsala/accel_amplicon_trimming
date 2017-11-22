@@ -1,0 +1,4 @@
+sample	unit	fq1	fq2
+sample1	lane1	fastq/sample1/sample1_S1_L001_R1_001.fastq	fastq/sample1/sample1_S1_L001_R2_001.fastq
+sample1	lane2	fastq/sample1/sample1_S1_L002_R1_001.fastq	fastq/sample1/sample1_S1_L002_R2_001.fastq
+sample2	rep1	fastq/sample2_S2_L001_R1_001.fastq	fastq/sample2_S2_L001_R2_001.fastq

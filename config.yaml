@@ -1,8 +1,17 @@
 ---
+# path or URL to sample sheet (TSV format, columns: sample, panel, ...)
+samples: samples.tsv
 
+# path or URL to sequencing unit sheet (TSV format, columns: sample, unit, fq1, fq2)
+# Units are technical replicates (e.g. lanes, or resequencing of the same biological
+# sample).
+units: units.tsv
+
+# the sequencing adapter
 illuminaclip_file: illuminaclip.fa
 
-accel_sequences:
+# Accel Panel and the associated primer files
+accel_panels:
   panel1:
     5p_primer_file: 5p_primers.fa
     3p_primer_file': 3p_primers.fa
