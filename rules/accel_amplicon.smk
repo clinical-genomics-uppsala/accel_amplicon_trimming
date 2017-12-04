@@ -57,7 +57,9 @@ rule cutadapt_step1:
     output:
         fastq1=temp("trimmed/{sample}-{unit}.tmpR1.fastq"),
         fastq2=temp("trimmed/{sample}-{unit}.tmpR2.fastq"),
-        qc=temp("logs/trimmed/{sample}-{unit}.cutadapt_STEP1.qc.txt")
+        qc=temp("qc/trimmed/{sample}-{unit}.cutadapt_STEP1.qc.txt")
+    log:
+        "logs/trimmed/{sample}-{unit}.cutadapt_STEP1.log"
     wrapper:
         "0.17.4/bio/cutadapt/pe"
 
@@ -68,7 +70,9 @@ rule cutadapt_step2:
     output:
         fastq1=temp("trimmed/{sample}-{unit}.5ptmpR2.fastq"),
         fastq2=temp("trimmed/{sample}-{unit}.5ptmpR1.fastq"),
-        qc = temp("logs/trimmed/{sample}-{unit}.cutadapt_STEP2.qc.txt")
+        qc=temp("qc/trimmed/{sample}-{unit}.cutadapt_STEP2.qc.txt")
+    log:
+        "logs/trimmed/{sample}-{unit}.cutadapt_STEP2.log"
     params:
         " --minimum-length 40",
         " -e 0.12",
@@ -89,7 +93,9 @@ rule cutadapt_step3:
     output:
         fastq1=temp("trimmed/{sample}-{unit}.tmp3R1.fastq"),
         fastq2=temp("trimmed/{sample}-{unit}.tmp3R2.fastq"),
-        qc = temp("logs/trimmed/{sample}-{unit}.cutadapt_STEP3.qc.txt")
+        qc=temp("qc/trimmed/{sample}-{unit}.cutadapt_STEP3.qc.txt")
+    log:
+        "logs/trimmed/{sample}-{unit}.cutadapt_STEP3.log"
     params:
         " --minimum-length 40",
         " -e 0.12",
@@ -105,7 +111,9 @@ rule cutadapt_step4:
     output:
         fastq1="trimmed/{sample}-{unit}.R1.trimmomatic_cutadapt.fastq.gz",
         fastq2="trimmed/{sample}-{unit}.R2.trimmomatic_cutadapt.fastq.gz",
-        qc = temp("logs/trimmed/{sample}-{unit}.cutadapt_STEP4.qc.txt")
+        qc=temp("qc/trimmed/{sample}-{unit}.cutadapt_STEP4.qc.txt")
+    log:
+        "logs/trimmed/{sample}-{unit}.cutadapt_STEP4.log"
     params:
         " --minimum-length 40",
         " -e 0.12",
@@ -119,12 +127,12 @@ rule cutadapt_step4:
 # Merge all generate log files into one,
 ###############################################################################
 
-rule merge_logs:
+rule merge_qc:
     input:
-        qc=expand("logs/trimmed/{{sample}}-{{unit}}.{steps}.qc.txt",
-                    steps=["trimmomatic","cutadapt_STEP1","cutadapt_STEP2","cutadapt_STEP3","cutadapt_STEP4"])
+        qc=expand("qc/trimmed/{{sample}}-{{unit}}.{steps}.qc.txt",
+                    steps=["cutadapt_STEP1","cutadapt_STEP2","cutadapt_STEP3","cutadapt_STEP4"])
     output:
-         qc="logs/trimmed/{sample}-{unit}.trimmomatic_cutadapt.qc.txt"
+         qc="qc/trimmed/{sample}-{unit}.trimmomatic_cutadapt.qc.txt"
     run:
         with open(output.qc,"w") as out:
             for qc_file in input.qc:
