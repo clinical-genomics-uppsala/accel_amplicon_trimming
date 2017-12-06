@@ -45,12 +45,25 @@ accel_panels:
 Example of a sample.tsv file (columns need to be
 tab separated)
 ```
+sample     panel
+sample1    panel1
+sample2    panel2
+```
+The panel column must contain a panel name that can be found
+in the accel_panels entry in the config.yaml
+
+#### unit.tsv
+Example of a units.tsv file (columns need to be
+tab separated)
+```
 sample     panel     fq1                fq2
 sample1    panel1    /path/to/sample1.R1.fastq   /path/to/sample1.R2.fastq
 sample2    panel2    /path/to/sample2.R1.fastq   /path/to/sample2.R2.fastq
 ```
-The panel column must contain a panel name that can be found
-in the accel_panels entry in the config.yaml
+sample	unit	fq1	fq2
+A	lane1	A.1.fastq	A.2.fastq
+```
+
 ### Step 3: Execute workflow
 
 Test your configuration by performing a dry-run via
