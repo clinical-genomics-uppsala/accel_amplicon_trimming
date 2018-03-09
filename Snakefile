@@ -10,8 +10,8 @@ units.index = units.index.set_levels([i.astype(str) for i in units.index.levels]
 
 rule all:
     input:
-        expand(["trimmed/{unit.sample}-{unit.unit}.R{read}.trimmomatic_cutadapt.fastq.gz",
-                "qc/trimmed/{unit.sample}-{unit.unit}.trimmomatic_cutadapt.qc.txt"],
+        expand(["trimmed/{unit.sample}.{unit.unit}.R{read}.trimmomatic_cutadapt.fastq.gz",
+                "qc/trimmed/{unit.sample}.{unit.unit}.trimmomatic_cutadapt.qc.txt"],
                unit=units.reset_index().itertuples(),
                read=[1, 2])
 
