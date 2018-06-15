@@ -109,8 +109,8 @@ rule cutadapt_step4:
         "trimmed/{sample}.{unit}.tmp3R2.fastq",
          "trimmed/{sample}.{unit}.tmp3R1.fastq"
     output:
-        fastq1="trimmed/{sample}.{unit}.R1.trimmomatic_cutadapt.fastq.gz",
-        fastq2="trimmed/{sample}.{unit}.R2.trimmomatic_cutadapt.fastq.gz",
+        fastq1="trimmed/{sample}.{unit}.R2.trimmomatic_cutadapt.fastq.gz",
+        fastq2="trimmed/{sample}.{unit}.R1.trimmomatic_cutadapt.fastq.gz",
         qc=temp("qc/trimmed/{sample}.{unit}.cutadapt_STEP4.qc.txt")
     log:
         "logs/trimmed/{sample}.{unit}.cutadapt_STEP4.log"
