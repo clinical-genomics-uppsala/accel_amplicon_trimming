@@ -7,6 +7,10 @@ samples: samples.tsv
 # sample).
 units: units.tsv
 
+num_fastq_split: 4
+
+phread_flag: "-phred64"
+
 # the sequencing adapter
 illuminaclip_file: illumina.fa
 
