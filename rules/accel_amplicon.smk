@@ -20,7 +20,7 @@ rule cgu_accel_extract_fastq_files:
    input:
       lambda wildcards: get_fastq(wildcards,units, 'fq1' if wildcards.read == "R1" else 'fq2')
    output:
-      temp("trimmed/.temp/{sample}.{unit}.{read,[R12]+}.fastq")
+      temp("trimmed/.temp_accel/{sample}.{unit}.{read,[R12]+}.fastq")
    run:
       if input[0].endswith("gz"):
          shell("zcat {input} > {output}")
@@ -29,9 +29,9 @@ rule cgu_accel_extract_fastq_files:
 
 rule cgu_accel_count_lines_in_fastq:
     input:
-      "trimmed/.temp/{sample}.{unit}.{read}.fastq"
+      "trimmed/.temp_accel/{sample}.{unit}.{read}.fastq"
     output:
-      temp("trimmed/.temp/{sample}.{unit}.{read}.var")
+      temp("trimmed/.temp_accel/{sample}.{unit}.{read}.var")
     wildcard_constraints:
       sample="[A-Za-z0-9-_]+",
       unit="[A-Za-z0-9]+",
@@ -44,16 +44,16 @@ rule cgu_accel_count_lines_in_fastq:
 
 rule cgu_accel_split_fastq_file:
    input:
-      "trimmed/.temp/{sample}.{unit}.{read}.fastq",
-      "trimmed/.temp/{sample}.{unit}.{read}.var"
+      "trimmed/.temp_accel/{sample}.{unit}.{read}.fastq",
+      "trimmed/.temp_accel/{sample}.{unit}.{read}.var"
    output:
-      temp(['trimmed/.temp/{sample}.{unit}.%02d.{read}.fastq' % num for num in range(0,int(config.get("num_fastq_split",1)))])
+      temp(['trimmed/.temp_accel/{sample}.{unit}.%02d.{read}.fastq' % num for num in range(0,int(config.get("num_fastq_split",1)))])
    wildcard_constraints:
       sample="[A-Za-z0-9-_]+",
       unit="[A-Za-z0-9]+",
       read="[R12]+"
    params:
-      output_prefix=lambda wildcards: "trimmed/.temp/" + wildcards.sample + "." + wildcards.unit + ".",
+      output_prefix=lambda wildcards: "trimmed/.temp_accel/" + wildcards.sample + "." + wildcards.unit + ".",
       output_suffix=lambda wildcards: "." + wildcards.read + ".fastq"
    run:
      import math
@@ -68,21 +68,21 @@ rule cgu_accel_split_fastq_file:
 
 rule cgu_accel_trimmomatic:
     input:
-        r1 = "trimmed/.temp/{sample}.{unit}.{part}.R1.fastq",
-        r2 = "trimmed/.temp/{sample}.{unit}.{part}.R2.fastq"
+        r1 = "trimmed/.temp_accel/{sample}.{unit}.{part}.R1.fastq",
+        r2 = "trimmed/.temp_accel/{sample}.{unit}.{part}.R2.fastq"
     output:
-        temp("logs/trimmed/.temp/{sample}.{unit}.{part}.trimmomatic.qc.txt"),
-        r1 = temp("trimmed/.temp/{sample}.{unit}.{part}.R1.trimmomatic.fastq"),
-        r2 = temp("trimmed/.temp/{sample}.{unit}.{part}.R2.trimmomatic.fastq"),
-        r1_unpaired=temp("trimmed/.temp/{sample}.{unit}.{part}.R1.trimmomatic.up.fastq"),
-        r2_unpaired=temp("trimmed/.temp/{sample}.{unit}.{part}.R2.trimmomatic.up.fastq")
+        temp("logs/trimmed/.temp_accel/{sample}.{unit}.{part}.trimmomatic.qc.txt"),
+        r1 = temp("trimmed/.temp_accel/{sample}.{unit}.{part}.R1.trimmomatic.fastq"),
+        r2 = temp("trimmed/.temp_accel/{sample}.{unit}.{part}.R2.trimmomatic.fastq"),
+        r1_unpaired=temp("trimmed/.temp_accel/{sample}.{unit}.{part}.R1.trimmomatic.up.fastq"),
+        r2_unpaired=temp("trimmed/.temp_accel/{sample}.{unit}.{part}.R2.trimmomatic.up.fastq")
     wildcard_constraints:
         sample="[A-Za-z0-9-_]+",
         unit="[A-Za-z0-9]+",
         part="[0-9]+"
     threads: 8
     log:
-        "logs/trimmed/.temp/{sample}.{unit}.{part}.trimmomatic.qc.txt"
+        "logs/trimmed/.temp_accel/{sample}.{unit}.{part}.trimmomatic.qc.txt"
     params:
     #ToDo fix so that threads are configurable!!!
         extra=lambda wildcards: "-threads 8 " + config.get("phread_flag",""),
@@ -105,17 +105,17 @@ rule cgu_accel_trimmomatic:
 
 rule cgu_accel_cutadapt_step1:
     input:
-        "trimmed/.temp/{sample}.{unit}.{part}.R1.trimmomatic.fastq",
-         "trimmed/.temp/{sample}.{unit}.{part}.R2.trimmomatic.fastq"
+        "trimmed/.temp_accel/{sample}.{unit}.{part}.R1.trimmomatic.fastq",
+         "trimmed/.temp_accel/{sample}.{unit}.{part}.R2.trimmomatic.fastq"
     params:
         " --minimum-length 40",
         " -e 0.12",
         lambda wildcards: \
             " -g file:" + config["cgu_accel_panels"][samples["panel"][wildcards.sample]]["5p_primer_file"]
     output:
-        fastq1=temp("trimmed/.temp/{sample}.{unit}.{part}.tmpR1.fastq"),
-        fastq2=temp("trimmed/.temp/{sample}.{unit}.{part}.tmpR2.fastq"),
-        qc=temp("qc/trimmed/.temp/{sample}.{unit}.{part}.cutadapt_STEP1.qc.txt")
+        fastq1=temp("trimmed/.temp_accel/{sample}.{unit}.{part}.tmpR1.fastq"),
+        fastq2=temp("trimmed/.temp_accel/{sample}.{unit}.{part}.tmpR2.fastq"),
+        qc=temp("qc/trimmed/.temp_accel/{sample}.{unit}.{part}.cutadapt_STEP1.qc.txt")
     wildcard_constraints:
         sample="[A-Za-z0-9-_]+",
         unit="[A-Za-z0-9]+",
@@ -127,18 +127,18 @@ rule cgu_accel_cutadapt_step1:
 
 rule cgu_accel_cutadapt_step2:
     input:
-        "trimmed/.temp/{sample}.{unit}.{part}.tmpR2.fastq",
-         "trimmed/.temp/{sample}.{unit}.{part}.tmpR1.fastq"
+        "trimmed/.temp_accel/{sample}.{unit}.{part}.tmpR2.fastq",
+         "trimmed/.temp_accel/{sample}.{unit}.{part}.tmpR1.fastq"
     output:
-        fastq1=temp("trimmed/.temp/{sample}.{unit}.{part}.5ptmpR2.fastq"),
-        fastq2=temp("trimmed/.temp/{sample}.{unit}.{part}.5ptmpR1.fastq"),
-        qc=temp("qc/trimmed/.temp/{sample}.{unit}.{part}.cutadapt_STEP2.qc.txt")
+        fastq1=temp("trimmed/.temp_accel/{sample}.{unit}.{part}.5ptmpR2.fastq"),
+        fastq2=temp("trimmed/.temp_accel/{sample}.{unit}.{part}.5ptmpR1.fastq"),
+        qc=temp("qc/trimmed/.temp_accel/{sample}.{unit}.{part}.cutadapt_STEP2.qc.txt")
     wildcard_constraints:
         sample="[A-Za-z0-9-_]+",
         unit="[A-Za-z0-9]+",
         part="[0-9]+"
     log:
-        "logs/trimmed/.temp/{sample}.{unit}.{part}.cutadapt_STEP2.log"
+        "logs/trimmed/.temp_accel/{sample}.{unit}.{part}.cutadapt_STEP2.log"
     params:
         " --minimum-length 40",
         " -e 0.12",
@@ -154,12 +154,12 @@ rule cgu_accel_cutadapt_step2:
 
 rule cgu_accel_cutadapt_step3:
     input:
-        ["trimmed/.temp/{sample}.{unit}.{part}.5ptmpR1.fastq",
-         "trimmed/.temp/{sample}.{unit}.{part}.5ptmpR2.fastq"]
+        ["trimmed/.temp_accel/{sample}.{unit}.{part}.5ptmpR1.fastq",
+         "trimmed/.temp_accel/{sample}.{unit}.{part}.5ptmpR2.fastq"]
     output:
-        fastq1=temp("trimmed/.temp/{sample}.{unit}.{part}.tmp3R1.fastq"),
-        fastq2=temp("trimmed/.temp/{sample}.{unit}.{part}.tmp3R2.fastq"),
-        qc=temp("qc/trimmed/.temp/{sample}.{unit}.{part}.cutadapt_STEP3.qc.txt")
+        fastq1=temp("trimmed/.temp_accel/{sample}.{unit}.{part}.tmp3R1.fastq"),
+        fastq2=temp("trimmed/.temp_accel/{sample}.{unit}.{part}.tmp3R2.fastq"),
+        qc=temp("qc/trimmed/.temp_accel/{sample}.{unit}.{part}.cutadapt_STEP3.qc.txt")
     wildcard_constraints:
         sample="[A-Za-z0-9-_]+",
         unit="[A-Za-z0-9]+",
@@ -176,12 +176,12 @@ rule cgu_accel_cutadapt_step3:
 
 rule cgu_accel_cutadapt_step4:
     input:
-        "trimmed/.temp/{sample}.{unit}.{part}.tmp3R2.fastq",
-         "trimmed/.temp/{sample}.{unit}.{part}.tmp3R1.fastq"
+        "trimmed/.temp_accel/{sample}.{unit}.{part}.tmp3R2.fastq",
+         "trimmed/.temp_accel/{sample}.{unit}.{part}.tmp3R1.fastq"
     output:
-        fastq1=temp("trimmed/.temp/{sample}.{unit}.{part}.R2.trimmomatic_cutadapt.fastq.gz"),
-        fastq2=temp("trimmed/.temp/{sample}.{unit}.{part}.R1.trimmomatic_cutadapt.fastq.gz"),
-        qc=temp("qc/trimmed/.temp/{sample}.{unit}.{part}.cutadapt_STEP4.qc.txt")
+        fastq1=temp("trimmed/.temp_accel/{sample}.{unit}.{part}.R2.trimmomatic_cutadapt.fastq.gz"),
+        fastq2=temp("trimmed/.temp_accel/{sample}.{unit}.{part}.R1.trimmomatic_cutadapt.fastq.gz"),
+        qc=temp("qc/trimmed/.temp_accel/{sample}.{unit}.{part}.cutadapt_STEP4.qc.txt")
     wildcard_constraints:
         sample="[A-Za-z0-9-_]+",
         unit="[A-Za-z0-9]+",
@@ -206,9 +206,9 @@ def get_parts(config):
 
 rule cgu_accel_merge_qc_split:
     input:
-        qc=lambda wildcards: ["qc/trimmed/.temp/" + wildcards.sample + "." + wildcards.unit + "." + part + "." + wildcards.step + ".qc.txt" for part in get_parts(config)]
+        qc=lambda wildcards: ["qc/trimmed/.temp_accel/" + wildcards.sample + "." + wildcards.unit + "." + part + "." + wildcards.step + ".qc.txt" for part in get_parts(config)]
     output:
-         qc="qc/trimmed/.temp/{sample}.{unit}.{step}.qc.txt"
+         qc="qc/trimmed/.temp_accel/{sample}.{unit}.{step}.qc.txt"
     wildcard_constraints:
         sample="[A-Za-z0-9-_]+",
         unit="[A-Za-z0-9]+",
@@ -220,9 +220,9 @@ rule cgu_accel_merge_qc_split:
                 with open(qc_file,"r") as qc_input:
                     out.write(qc_input.read())
 
-rule cgu_accel_merge_qc:
+rule cgu_accel_merge_qc_final:
     input:
-        qc=expand("qc/trimmed/.temp/{{sample}}.{{unit}}.{steps}.qc.txt",
+        qc=expand("qc/trimmed/.temp_accel/{{sample}}.{{unit}}.{steps}.qc.txt",
                     steps=["cutadapt_STEP1","cutadapt_STEP2","cutadapt_STEP3","cutadapt_STEP4"])
     output:
          qc="qc/trimmed/{sample}.{unit}.trimmomatic_cutadapt.qc.txt"
@@ -237,11 +237,44 @@ rule cgu_accel_merge_qc:
                 with open(qc_file,"r") as qc_input:
                     out.write(qc_input.read())
 
+rule cgu_accel_merge_qc_final_split:
+    input:
+        qc=expand("qc/trimmed/.temp_accel/{{sample}}.{{unit}}.{{part}}.{steps}.qc.txt",
+                    steps=["cutadapt_STEP1","cutadapt_STEP2","cutadapt_STEP3","cutadapt_STEP4"])
+    output:
+         qc="qc/trimmed/{sample}.{unit}.{part}.trimmomatic_cutadapt.qc.txt"
+    wildcard_constraints:
+         sample="[A-Za-z0-9-_]+",
+         unit="[A-Za-z0-9]+",
+         step="[A-Za-z0-9_]+",
+         part="[0-9]+"
+    run:
+        with open(output.qc,"w") as out:
+            for qc_file in input.qc:
+                with open(qc_file,"r") as qc_input:
+                    out.write(qc_input.read())
+
+rule cgu_accel_move_fastq:
+    input:
+        "trimmed/.temp_accel/{sample}.{unit}.{part}.{read}.trimmomatic_cutadapt.fastq.gz"
+    output:
+        "trimmed/{sample}.{unit}.{part}.{read}.trimmomatic_cutadapt.fastq.gz"
+    wildcard_constraints:
+         sample="[A-Za-z0-9-_]+",
+         unit="[A-Za-z0-9]+",
+         step="[A-Za-z0-9_]+",
+         part="[0-9]+",
+         read="[R12]+"
+    shell: "mv {input} {output}"
+
 rule cgu_accel_merge_split:
     input:
-        lambda wildcards: ["trimmed/.temp/" + wildcards.sample + "." + wildcards.unit + "." + part + "." + wildcards.read + ".trimmomatic_cutadapt.fastq.gz" for part in get_parts(config)]
+        lambda wildcards: ["trimmed/.temp_accel/" + wildcards.sample + "." + wildcards.unit + "." + part + "." + wildcards.read + ".trimmomatic_cutadapt.fastq.gz" for part in get_parts(config)]
     output:
         "trimmed/{sample}.{unit}.{read}.trimmomatic_cutadapt.fastq.gz"
     wildcard_constraints:
-        sample="[A-Za-z0-9-_]+"
+         sample="[A-Za-z0-9-_]+",
+         unit="[A-Za-z0-9]+",
+         step="[A-Za-z0-9_]+",
+         part="[0-9]+"
     shell: "zcat {input} | gzip > {output}"
