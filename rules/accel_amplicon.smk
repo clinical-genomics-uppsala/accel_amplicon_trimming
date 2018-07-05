@@ -14,7 +14,7 @@ from pytools.persistent_dict import PersistentDict
 storage = PersistentDict("accelamplicon_storage")
 
 def _accel_get_num_splits(config):
-    return int(config.get("accel_num_fastq_split",config.get("num_fastq_split",1)))
+    return int(config.get("cgu_accel_num_fastq_split",config.get("num_fastq_split",1)))
 
 def _accel_get_fastq(wildcards,units,read):
     return units.loc[(wildcards.sample, wildcards.unit), [read]].dropna()[0]
@@ -205,7 +205,7 @@ rule cgu_accel_cutadapt_step4:
 ###############################################################################
 
 def get_parts(config):
-  return [ "%02d"  % part for part in range(0,config.get("num_fastq_split", 1)) for unit in units]
+  return [ "%02d"  % part for part in range(0,_accel_get_num_splits(config)) for unit in units]
 
 rule cgu_accel_merge_qc_split:
     input:
