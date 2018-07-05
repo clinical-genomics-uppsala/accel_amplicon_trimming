@@ -8,7 +8,7 @@ samples: samples.tsv
 units: units.tsv
 
 # Number of parts a fastq file should be split into
-num_fastq_split: 4
+cgu_accel_num_fastq_split: 4
 
 # Flag to force phred typ, can be removed to make trimmomatic determine score.
 phread_flag: "-phred64"

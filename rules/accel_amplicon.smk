@@ -13,12 +13,15 @@ from pytools.persistent_dict import PersistentDict
 
 storage = PersistentDict("accelamplicon_storage")
 
-def get_fastq(wildcards,units,read):
-  return units.loc[(wildcards.sample, wildcards.unit), [read]].dropna()[0]
+def _accel_get_num_splits(config):
+    return int(config.get("accel_num_fastq_split",config.get("num_fastq_split",1)))
+
+def _accel_get_fastq(wildcards,units,read):
+    return units.loc[(wildcards.sample, wildcards.unit), [read]].dropna()[0]
 
 rule cgu_accel_extract_fastq_files:
    input:
-      lambda wildcards: get_fastq(wildcards,units, 'fq1' if wildcards.read == "R1" else 'fq2')
+      lambda wildcards: _accel_get_fastq(wildcards,units, 'fq1' if wildcards.read == "R1" else 'fq2')
    output:
       temp("trimmed/.temp_accel/{sample}.{unit}.{read,[R12]+}.fastq")
    run:
@@ -47,7 +50,7 @@ rule cgu_accel_split_fastq_file:
       "trimmed/.temp_accel/{sample}.{unit}.{read}.fastq",
       "trimmed/.temp_accel/{sample}.{unit}.{read}.var"
    output:
-      temp(['trimmed/.temp_accel/{sample}.{unit}.%02d.{read}.fastq' % num for num in range(0,int(config.get("num_fastq_split",1)))])
+      temp(['trimmed/.temp_accel/{sample}.{unit}.%02d.{read}.fastq' % num for num in range(0,_accel_get_num_splits(config))])
    wildcard_constraints:
       sample="[A-Za-z0-9-_]+",
       unit="[A-Za-z0-9]+",
@@ -58,7 +61,7 @@ rule cgu_accel_split_fastq_file:
    run:
      import math
      num_reads = int(storage.fetch(wildcards.sample + "." + wildcards.unit + "." + wildcards.read + ".var"))
-     num_split = int(config.get("num_fastq_split",1))
+     num_split = _accel_get_num_splits(config)
      lines_per_file = 4*math.ceil(num_reads / num_split)
      number_of_generated_files = num_split - math.ceil(4*num_reads/lines_per_file)
      shell("split -d -l {lines_per_file} {input[0]} {params.output_prefix} --additional-suffix={params.output_suffix}")
