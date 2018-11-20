@@ -1,2 +1,2 @@
 sample	unit	fq1	fq2
-A	lane1	A.1.fastq	A.2.fastq
+A	lane1	A.1.fastq.gz	A.2.fastq.gz
