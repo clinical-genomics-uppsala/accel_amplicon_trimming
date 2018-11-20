@@ -11,7 +11,7 @@ units: units.tsv
 illuminaclip_file: illuminaclip.fa
 
 # Accel Panel and the associated primer files
-accel_panels:
+cgu_accel_panels:
   panel1:
     5p_primer_file: 5p_primers.fa
     3p_primer_file': 3p_primers.fa
