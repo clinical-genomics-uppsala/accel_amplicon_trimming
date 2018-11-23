@@ -50,7 +50,7 @@ rule cgu_accel_split_fastq_file:
       "trimmed/.temp_accel/{sample}.{unit}.{read}.fastq",
       "trimmed/.temp_accel/{sample}.{unit}.{read}.var"
    output:
-      temp(['trimmed/.temp_accel/{sample}.{unit}.%02d.{read}.fastq' % num for num in range(0,_accel_get_num_splits(config))])
+      temp(['trimmed/.temp_accel/{sample}.{unit}.%04d.{read}.fastq' % num for num in range(0,_accel_get_num_splits(config))])
    wildcard_constraints:
       sample="[A-Za-z0-9-_]+",
       unit="[A-Za-z0-9]+",
@@ -63,11 +63,11 @@ rule cgu_accel_split_fastq_file:
      num_reads = int(storage.fetch(wildcards.sample + "." + wildcards.unit + "." + wildcards.read + ".var"))
      num_split = _accel_get_num_splits(config)
      lines_per_file = 4*math.ceil(num_reads / num_split)
-     number_of_generated_files = num_split - math.ceil(4*num_reads/lines_per_file)
-     shell("split -d -l {lines_per_file} {input[0]} {params.output_prefix} --additional-suffix={params.output_suffix}")
-     if number_of_generated_files < num_split and num_split > 1:
-        for part in range(number_of_generated_files,num_split):
-            shell("touch " + params.output_prefix + ("%02d" % part)  + params.output_suffix)
+     shell('cat {input[0]} | awk \'BEGIN{{ file = 0; filename = sprintf("{params.output_prefix}%.04d{params.output_suffix}", file) }}{{ print > filename}} NR % {lines_per_file} == 0 {{ close(filename); file = file + 1; filename = sprintf("{params.output_prefix}%.04d{params.output_suffix}",file)}}\'')
+     num_files_generated = 4*math.floor(num_reads / lines_per_file)
+     while num_files_generated < num_split:
+        shell("touch {params.output_prefix}%04d{params.output_suffix}" % num_split)
+        num_split -= 1
 
 rule cgu_accel_trimmomatic:
     input:
@@ -205,7 +205,7 @@ rule cgu_accel_cutadapt_step4:
 ###############################################################################
 
 def get_parts(config):
-  return [ "%02d"  % part for part in range(0,_accel_get_num_splits(config)) for unit in units]
+  return [ "%04d"  % part for part in range(0,_accel_get_num_splits(config)) for unit in units]
 
 rule cgu_accel_merge_qc_split:
     input:
